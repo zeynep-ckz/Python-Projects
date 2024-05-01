@@ -1,3 +1,5 @@
+# the link to play:
+# https://academy.cs.cmu.edu/sharing/navyHorse6752
 from cmu_graphics import *
 import random
 
