@@ -1,0 +1,195 @@
+# link to play:
+# https://academy.cs.cmu.edu/sharing/siennaBee9222
+from cmu_graphics import *
+import math
+
+def onAppStart(app):
+    app.rows = 6
+    app.cols = 7
+    app.boardLeft = 50
+    app.boardTop = 75
+    app.boardWidth = 300
+    app.boardHeight = 300
+    app.cellBorderWidth = 2
+    resetApp(app)
+    
+def resetApp(app):
+    app.board = [[None]*app.cols for row in range(app.rows)]
+    app.selection = None
+    app.turn = 'X'
+    app.turnCount = 0
+    app.gameover = False
+    app.message = "X's turn"
+    app.winCell = None
+
+def onMousePress(app, mouseX, mouseY):
+    app.selection = None
+    if not app.gameover:
+        col = getColumn(app, mouseX, mouseY)
+        if col != None:
+            row = getLowestRow(app, col)
+            if row != None:
+                makeMove(app, row, col)
+
+def onMouseMove(app, mouseX, mouseY):
+    cell = getCell(app, mouseX, mouseY)
+    if cell == None:
+        app.selection = None
+    else:
+        row, col = cell
+        if app.board[row][col] == None:
+            app.selection = cell
+        else:
+            app.selection = None
+
+def onKeyPress(app, key):
+    if key == 'r' and app.gameover:
+        resetApp(app)
+
+def redrawAll(app):
+    drawLabel('Connect4', 200, 30, size=16)
+    drawBoard(app)
+    drawMessage(app)
+    drawBoardBorder(app)
+    drawWinLine(app)
+
+def drawWinLine(app):
+    if app.winCell != None:
+        cx1, cy1 = center(app, app.winCell[0])
+        cx2, cy2 = center(app, app.winCell[-1])
+        drawLine(cx1, cy1, cx2, cy2)
+        
+def drawMessage(app):
+    if app.gameover:
+        message = app.message + ' (press r to restart)'
+        color = 'red'
+    else:
+        message = app.message
+        color = 'black'
+    drawLabel(message, 200, 50, size=14, fill = color)
+
+def drawBoard(app):
+    for row in range(app.rows):
+        for col in range(app.cols):
+            if app.selection != None:
+                x, y = app.selection
+                if col == y:
+                    color = 'cyan'
+                else:
+                    color = None
+            else:
+                color = None
+            drawCell(app, row, col, color)
+
+def drawBoardBorder(app):
+    # draw the board outline (with double-thickness):
+    drawRect(app.boardLeft, app.boardTop, app.boardWidth, app.boardHeight,
+           fill=None, border='black',
+           borderWidth=2*app.cellBorderWidth)
+
+def drawCell(app, row, col, color):
+    cellLeft, cellTop = getCellLeftTop(app, row, col)
+    cellWidth, cellHeight = getCellSize(app)
+    drawRect(cellLeft, cellTop, cellWidth, cellHeight,
+             fill = color, border = 'black',
+             borderWidth = app.cellBorderWidth)
+    
+    label = app.board[row][col]
+    if label != None:
+        cx = cellLeft + cellWidth/2
+        cy = cellTop + cellHeight/2
+        drawLabel(label, cx, cy, size = 24, bold = True)
+
+def getCell(app, x, y):
+    dx = x - app.boardLeft
+    dy = y - app.boardTop
+    cellWidth, cellHeight = getCellSize(app)
+    row = math.floor(dy / cellHeight)
+    col = math.floor(dx / cellWidth)
+    if (0 <= row < app.rows) and (0 <= col < app.cols):
+      return (row, col)
+    else:
+      return None
+
+def getColumn(app, x, y):
+    colWidth = app.boardWidth / app.cols
+    col = int((x - app.boardLeft)/colWidth)
+    if 0 <= col < app.cols and app.board[0][col] == None:
+        return col
+    return None
+    
+def getLowestRow(app, col):
+    for row in range(app.rows - 1, -1, -1):
+        if app.board[row][col] == None:
+            return row
+    return None
+
+def getCellLeftTop(app, row, col):
+    cellWidth, cellHeight = getCellSize(app)
+    cellLeft = app.boardLeft + col * cellWidth
+    cellTop = app.boardTop + row * cellHeight
+    return (cellLeft, cellTop)
+
+def getCellSize(app):
+    cellWidth = app.boardWidth / app.cols
+    cellHeight = app.boardHeight / app.rows
+    return (cellWidth, cellHeight)
+    
+def center(app, cell):
+    row, col = cell
+    left, top = getCellLeftTop(app, row, col)
+    w, h = getCellSize(app)
+    cx = left + w/2
+    cy = top + h/2
+    return cx, cy
+
+def makeMove(app, row, col):
+    app.board[row][col] = app.turn
+    app.turnCount += 1
+    changeTurns(app)
+    gameOver(app)
+    
+def changeTurns(app):
+    app.turn = 'O' if app.turn == 'X' else 'X'
+    app.message = f"{app.turn}'s turn"
+
+def gameOver(app):
+    tie(app)
+    win(app)
+
+def win(app):
+    directions = [(0, 1), (1, 0), (1, 1), (1, -1)]
+    for startR in range(app.rows):
+        for startC in range(app.cols):
+            for drow, dcol in directions:
+                winner = windir(app, startR, startC, drow, dcol)
+                if winner != None:
+                    app.gameover = True
+                    app.message = f'{winner} wins!'
+                    return
+
+def windir(app, startR, startC, drow, dcol):
+    player = app.board[startR][startC]
+    if player == None:
+        return None
+    winningCell = []
+    for i in range(4):
+        row = startR + i * drow
+        col = startC + i * dcol
+        if (row < 0 or row >= app.rows or col < 0 or col >= app.cols):
+            return None
+        if app.board[row][col] != player:
+            return None
+        winningCell.append((row, col))
+    app.winCell = winningCell
+    return player
+
+def tie(app):
+    if app.turnCount == app.rows * app.cols:
+        app.gameover = True
+        app.message = 'Tie game!'
+
+def main():
+    runApp()
+
+main()
