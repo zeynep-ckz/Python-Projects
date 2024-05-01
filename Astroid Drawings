@@ -1,0 +1,48 @@
+# link to play:
+# https://academy.cs.cmu.edu/sharing/turquoiseDog2039
+from cmu_graphics import *
+
+def onAppStart(app):
+    app.hashes = 3 # number of points on each half-axis (excluding the origin)
+
+def redrawAll(app):
+    drawLabel('Astroid Drawings', 200, 30, size=16)
+    drawLabel('Use arrows to add or reduce # of lines', 200, 50, size=12)
+    drawLabel(f'Currently using {app.hashes} points per half-axis', 200, 70, size=12)
+        #the lines
+    cx = 200
+    cy = 225
+    r = 140
+    left = cx - r
+    right = cx + r
+    up = cy - r
+    down = cy + r
+        #non-changing:
+    drawLine(cx, up, cx, down)
+    drawLine(left, cy, right, cy)
+        #increasing:
+    d = r / app.hashes
+    for x in range(app.hashes):
+        #first
+        drawLine(cx, cy - (x + 1) * d,
+                 right - (x * d), cy)
+        #second
+        drawLine(cx, cy - (x + 1) * d,
+                 left + (x * d), cy)
+        #third
+        drawLine(cx, cy + (x + 1) * d,
+                 left + (x * d), cy)
+        #fourth
+        drawLine(cx, cy + (x + 1) * d,
+                 right - (x * d), cy)
+    
+def onKeyPress(app, key):
+    if key == 'up' or key == 'right':
+        app.hashes += 1
+    elif (key == 'down' or key == 'left') and (app.hashes > 1):
+        app.hashes -= 1
+
+def main():
+    runApp()
+
+main()
