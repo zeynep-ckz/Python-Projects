@@ -1,0 +1,160 @@
+# link to play:
+# https://academy.cs.cmu.edu/sharing/goldChimpanzee4383
+from cmu_graphics import *
+'''
+Zeynep Azra Cakez
+12/30/2023
+1/3/2024
+Project Description:
+    This app makes art out of circles/dots Each click changes the radius, color,
+and location of a circle/dot. (decreasing order) After 7 clicks, the circles 
+set, the 8th click will make them drop at different speeds. Or after pressing
+'r', the canvas empties.
+Instructions:
+    When the app opens, click on the blank screen to create a large circle. To
+create more circles, decreasing in radius, keep clicking anywhere. After 7 total
+circles are created, The app will start dropping the circles, and if you want to
+stop before the 7th circle; click r to reset the canvas.
+Credits: -
+Updates: -
+Rubric Items
+Constant: 45-47
+Variable: 129-142, 144-150, 152-153
+Operator: 72, 116-122
+Built-In Function: 38-40, 43-68
+Helper Function: 70-107, 109-112, 114-125, 127-153
+if-elif-else: 49-68, 74-97, 99-102, 104-107, 110-112, 123-125
+Nested Conditional: -
+Shape 1: 49-68
+Shape 2: -
+Shape 3: -
+Key Event 1: 70-107
+Key Event 2: 109-112
+Mouse Event 1: 70-107
+Mouse Event 2: -
+Timer Event: 114-125
+Motion 1: 116-122
+Motion 2: -
+'''
+#start app
+def onAppStart(app):
+    #yeah, basically start = restart
+    restart(app)
+
+#draws graphics: shapes and labels
+def redrawAll(app):
+    #the instructions on how to use app
+    drawLabel('Dot Art', 200, 20, size = 20, bold = True)
+    drawLabel('Click anywhere to make new dots!', 200, 40, size = 15, bold = True)
+    drawLabel('Press r to restart!', 200, 60, size = 15, bold = True)
+    #the circles drawn
+    if app.circle1 == True:
+        drawCircle(app.cx1, app.cy1, 80, fill = 'red', border = 'black')
+    
+    if app.circle2 == True:
+        drawCircle(app.cx2, app.cy2, 70, fill = 'orange', border = 'black')
+    
+    if app.circle3 == True:
+        drawCircle(app.cx3, app.cy3, 60, fill = 'yellow', border = 'black')
+    
+    if app.circle4 == True:
+        drawCircle(app.cx4, app.cy4, 50, fill = 'lightGreen', border = 'black')
+    
+    if app.circle5 == True:
+        drawCircle(app.cx5, app.cy5, 40, fill = 'lightSkyBlue', border = 'black')
+    
+    if app.circle6 == True:
+        drawCircle(app.cx6, app.cy6, 30, fill = 'lavender', border = 'black')
+    
+    if app.circle7 == True:
+        drawCircle(app.cx7, app.cy7, 20, fill = 'pink', border = 'black')
+
+def onMousePress(app, mouseX, mouseY):
+    #keeping track of how many times the screen has been clicked
+    app.tapScreen += 1
+    #assigning each tap a circle
+    if app.tapScreen == 1:
+        app.circle1 = True
+        app.cx1 = mouseX
+        app.cy1 = mouseY
+    if app.tapScreen == 2:
+        app.circle2 = True
+        app.cx2 = mouseX
+        app.cy2 = mouseY
+    if app.tapScreen == 3:
+        app.circle3 = True
+        app.cx3 = mouseX
+        app.cy3 = mouseY
+    if app.tapScreen == 4:
+        app.circle4 = True
+        app.cx4 = mouseX
+        app.cy4 = mouseY
+    if app.tapScreen == 5:
+        app.circle5 = True
+        app.cx5 = mouseX
+        app.cy5 = mouseY
+    if app.tapScreen == 6:
+        app.circle6 = True
+        app.cx6 = mouseX
+        app.cy6 = mouseY
+    #resetting for last tap (before the drop)
+    if app.tapScreen == 7:
+        app.circle7 = True
+        app.cx7 = mouseX
+        app.cy7 = mouseY
+    #if there is more than 8 taps, reset and drop animation
+    if app.tapScreen >= 8:
+        #unpauses the app
+        app.stepsPerSecond = 15
+        onStep(app)
+
+def onKeyPress(app, key):
+    if key == 'r':
+        app.stepsPerSecond = 15
+        onStep(app)
+
+def onStep(app):
+    #dropping circles at different speeds
+    app.cy1 += 10
+    app.cy2 += 9
+    app.cy3 += 8
+    app.cy4 += 7
+    app.cy5 += 6
+    app.cy6 += 5
+    app.cy7 += 4
+    if (app.cy1 > 400 and app.cy2 > 400 and app.cy3 > 400 and app.cy4 > 400
+    and app.cy5 > 400 and app.cy6 > 400 and app.cy7 > 400):
+        restart(app)
+
+def restart(app):
+    #x and y values of the circles centers
+    app.cx1 = 200 
+    app.cy1 = 200
+    app.cx2 = 200 
+    app.cy2 = 200
+    app.cx3 = 200 
+    app.cy3 = 200
+    app.cx4 = 200 
+    app.cy4 = 200
+    app.cx5 = 200 
+    app.cy5 = 200
+    app.cx6 = 200 
+    app.cy6 = 200
+    app.cx7 = 200 
+    app.cy7 = 200
+    #visibility of the circles
+    app.circle1 = False
+    app.circle2 = False
+    app.circle3 = False
+    app.circle4 = False
+    app.circle5 = False
+    app.circle6 = False
+    app.circle7 = False
+    #other variables
+    app.tapScreen = 0
+    app.stepsPerSecond = 0
+
+def main():
+    runApp()
+
+main()
